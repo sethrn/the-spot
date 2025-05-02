@@ -294,7 +294,7 @@ def api_update_business():
     data = request.get_json()
     required_fields = [
         "business_id", "account_id", "name", "address", "city", "state",
-        "postal_code", "latitude", "longitude", "stars", "review_count",
+        "postal_code", "latitude", "longitude",
         "is_open", "attributes", "categories", "hours"
     ]
 
@@ -311,9 +311,8 @@ def api_update_business():
         cur.execute(sql, (
             data["name"], data["address"], data["city"], data["state"],
             data["postal_code"], data["latitude"], data["longitude"],
-            data["stars"], data["review_count"], data["is_open"],
-            Json(data["attributes"]), data["categories"], Json(data["hours"]),
-            data["business_id"], data["account_id"]
+            data["is_open"], Json(data["attributes"]), data["categories"], 
+            Json(data["hours"]), data["business_id"], data["account_id"]
         ))
 
         conn.commit()

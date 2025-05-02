@@ -1,5 +1,89 @@
 import { getSession } from "./session.js";
 
+function populateBusinessForm(data) {
+    document.getElementById("name").value = data.name || "";
+    document.getElementById("address").value = data.address || "";
+    document.getElementById("city").value = data.city || "";
+    document.getElementById("state").value = data.state || "";
+    document.getElementById("postal_code").value = data.postal_code || "";
+    document.getElementById("latitude").value = data.latitude || "";
+    document.getElementById("longitude").value = data.longitude || "";
+    document.getElementById("is_open").value = data.is_open ? "true" : "false";
+    document.getElementById("attributes").value = JSON.stringify(data.attributes || {}, null, 2);
+    document.getElementById("categories").value = (data.categories || []).join(", ");
+    document.getElementById("hours").value = JSON.stringify(data.hours || {}, null, 2);
+}
+
+function fetchBusinessDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const businessId = params.get("businessId");
+    const accountId = sessionStorage.getItem("account_id");
+
+    if (!businessId || !accountId) {
+        alert("Missing business/account ID");
+        return;
+    }
+
+    fetch(`/api/business?businessId=${businessId}&accountId=${accountId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                populateBusinessForm(data.details);
+                sessionStorage.setItem("current_business_id", businessId);
+            } else {
+                alert("Error fetching business: " + data.error);
+            }
+        });
+}
+function updateBusiness() {
+    const accountId = sessionStorage.getItem("account_id");
+    const businessId = sessionStorage.getItem("current_business_id");
+
+    if (!accountId || !businessId) {
+        alert("Session expired or invalid access.");
+        window.location.href = "/";
+        return;
+    }
+
+    // Get all updated form values
+    const data = {
+        business_id: businessId,
+        business_account_id: parseInt(accountId),
+        name: document.getElementById("name").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        postal_code: document.getElementById("postal_code").value,
+        latitude: parseFloat(document.getElementById("latitude").value),
+        longitude: parseFloat(document.getElementById("longitude").value),
+        is_open: document.getElementById("is_open").value === "true",
+        attributes: JSON.parse(document.getElementById("attributes").value || "{}"),
+        categories: document.getElementById("categories").value.split(",").map(s => s.trim()).filter(Boolean),
+        hours: JSON.parse(document.getElementById("hours").value || "{}")
+    };
+
+    fetch("/api/business/update", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                alert("Business updated successfully!");
+                window.location.href = "/manage";
+            } else {
+                alert("Update failed: " + res.error);
+            }
+        })
+        .catch(err => {
+            console.error("Error updating business:", err);
+            alert("Unexpected error occurred.");
+        });
+}
+
 window.onload = () => {
     const { accountType, accountId } = getSession();
 
@@ -30,7 +114,7 @@ window.onload = () => {
                     bizRow.style.padding = "10px";
 
                     const text = document.createElement("span");
-                    text.innerText = `${biz.name} — ${biz.address} — Rating: ${biz.stars} — Open: ${biz.is_open ? "Yes" : "No"}`;
+                    text.innerText = `${biz.name} | ${biz.address} | Rating: ${biz.stars} | Open: ${biz.is_open ? "Yes" : "No"}`;
 
                     const viewBtn = document.createElement("button");
                     viewBtn.innerText = "View Details";
@@ -87,5 +171,7 @@ window.onload = () => {
                 console.error(err);
             }
         };
+    } else if (window.location.pathname.includes("details")) {
+        fetchBusinessDetails();
     }
 };
