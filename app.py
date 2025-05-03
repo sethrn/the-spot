@@ -411,6 +411,9 @@ def api_search_businesses():
         cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
         rows = cur.fetchall()
 
+        print("cur.description:", cur.description)
+
+
         print("Returned rows:", rows)
         for i, row in enumerate(rows):
             print(f"Row {i}:", row)
