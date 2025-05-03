@@ -202,6 +202,7 @@ window.onload = () => {
             window.location.href = "/";
             return;
         }
+        console.log("Running /search/details logic");
 
         const params = new URLSearchParams(window.location.search);
         const businessId = params.get("businessId");
@@ -215,6 +216,8 @@ window.onload = () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+                    console.log("Running /search/details logic");
+
                     populateBusinessDetails(data.details);
                     populateReviews(data.reviews);
                     populateTips(data.tips);
