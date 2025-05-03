@@ -375,7 +375,45 @@ def api_create_business():
 # ===== USER ACCOUNT =====
 @app.route("/api/search", methods=["POST"])
 def api_search_businesses():
-    return jsonify({"results": []})
+    data = request.get_json()
+
+    name = data.get("name")
+    state = data.get("state")
+    is_open = data.get("is_open")
+    page_size = data.get("page_size")
+    page = data.get("page")
+
+    try:
+        page_size = int(page_size)
+        page = int(page)
+        assert page_size > 0 and page >= 0
+    except (TypeError, ValueError, AssertionError):
+        return jsonify(success=False, error="Invalid pagination parameters")
+
+    offset = page * page_size
+    limit = page_size
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        with open("database/user/get_businesses_by_query.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
+        rows = cur.fetchall()
+        colnames = [desc[0] for desc in cur.description]
+        results = [dict(zip(colnames, row)) for row in rows]
+
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, businesses=results)
+
+    except Exception as e:
+        print("Search error:", e)
+        return jsonify(success=False, error="Internal server error")
+
 
 @app.route("/api/business/review", methods=["POST"])
 def api_post_review():
