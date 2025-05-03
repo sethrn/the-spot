@@ -402,6 +402,10 @@ def api_search_businesses():
 
         cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
         rows = cur.fetchall()
+
+        print("Returned rows:", rows)
+        for i, row in enumerate(rows):
+            print(f"Row {i}:", row)
         colnames = [desc[0] for desc in cur.description]
         results = [dict(zip(colnames, row)) for row in rows]
 
