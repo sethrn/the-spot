@@ -379,58 +379,51 @@ def api_search_businesses():
 
     name = data.get("name")
     state = data.get("state")
-    is_open_raw = data.get("is_open")
-    if isinstance(is_open_raw, bool):
-        is_open = 1 if is_open_raw else 0
-    else:
-        is_open = None
-    page_size = data.get("page_size")
-    page = data.get("page")
-
-
-    try:
-        page_size = int(page_size)
-        page = int(page)
-        assert page_size > 0 and page >= 0
-    except (TypeError, ValueError, AssertionError):
-        return jsonify(success=False, error="Invalid pagination parameters")
+    is_open = data.get("is_open")
+    page_size = int(data.get("page_size", 20))
+    page = int(data.get("page", 0))
 
     offset = page * page_size
     limit = page_size
 
-    print("SQL Params:", name, name, state, state, is_open, is_open, limit, offset)
-    print("Types:", [type(p) for p in (name, name, state, state, is_open, is_open, limit, offset)])
+    conditions = []
+    params = []
+
+    if name:
+        conditions.append("name ILIKE %s")
+        params.append(f"%{name}%")
+    if state:
+        conditions.append("state = %s")
+        params.append(state)
+    if is_open is not None:
+        conditions.append("is_open = %s")
+        params.append(bool(is_open))
+
+    where_clause = "WHERE " + " AND ".join(conditions) if conditions else ""
+    sql = f"""
+        SELECT business_id, name, stars, review_count, categories
+        FROM business
+        {where_clause}
+        ORDER BY stars DESC
+        LIMIT %s OFFSET %s;
+    """
+    params.extend([limit, offset])
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        print("Final SQL:", sql)
+        print("Params:", params)
 
-        sql = """
-        SELECT business_id, name, stars, review_count, categories
-        FROM business
-        WHERE
-            (%s IS NULL OR name ILIKE '%' || %s || '%')
-            AND (%s IS NULL OR state = %s)
-            AND (%s IS NULL OR is_open = %s::boolean)
-        ORDER BY stars DESC
-        LIMIT %s OFFSET %s;
-        """
-
-        cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
+        cur.execute(sql, tuple(params))
         rows = cur.fetchall()
-
-        print("Fetched rows:", rows)
 
         if not rows:
             return jsonify(success=True, businesses=[])
 
-
-        print("Returned rows:", rows)
-        for i, row in enumerate(rows):
-            print(f"Row {i}:", row)
         colnames = [desc[0] for desc in cur.description]
         results = [dict(zip(colnames, row)) for row in rows]
-
+        
         cur.close()
         conn.close()
 
