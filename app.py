@@ -379,7 +379,11 @@ def api_search_businesses():
 
     name = data.get("name")
     state = data.get("state")
-    is_open = data.get("is_open")
+    is_open_raw = data.get("is_open")
+    if isinstance(is_open_raw, bool):
+        is_open = 1 if is_open_raw else 0
+    else:
+        is_open = None
     page_size = data.get("page_size")
     page = data.get("page")
 
