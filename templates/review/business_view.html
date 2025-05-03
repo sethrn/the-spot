@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Details</title>
+    <script type="module" src="/static/user.js"></script>
+    <script src="/static/session.js"></script>
+    <style>
+        .section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
+        }
+
+        .entry-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .entry-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .scroll-box {
+            height: 250px;
+            overflow-y: scroll;
+            border: 1px solid #aaa;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Business Details</h2>
+
+    <div class="section" id="businessInfo">
+        <p><strong>Name:</strong> <span id="bizName"></span></p>
+        <p><strong>Address:</strong> <span id="bizAddress"></span></p>
+        <p><strong>Location:</strong> <span id="bizLocation"></span></p>
+        <p><strong>Rating:</strong> <span id="bizStars"></span></p>
+        <p><strong>Review Count:</strong> <span id="bizReviewCount"></span></p>
+        <p><strong>Status:</strong> <span id="bizIsOpen"></span></p>
+        <p><strong>Categories:</strong> <span id="bizCategories"></span></p>
+        <p><strong>Attributes:</strong> <pre id="bizAttributes"></pre></p>
+        <p><strong>Hours:</strong> <pre id="bizHours"></pre></p>
+    </div>
+
+    <div class="section">
+        <h3>Tips</h3>
+        <textarea id="newTipText" rows="3" cols="60" placeholder="Write a tip..."></textarea><br>
+        <button onclick="addTip()">Submit Tip</button>
+
+        <div id="tipList" class="scroll-box"></div>
+    </div>
+
+    <div class="section">
+        <h3>Reviews</h3>
+        <textarea id="newReviewText" rows="4" cols="60" placeholder="Write a review..."></textarea><br>
+        <button onclick="addReview()">Submit Review</button>
+
+        <div id="reviewList" class="scroll-box"></div>
+    </div>
+
+    <button onclick="window.location.href='/search'">Back to Search</button>
+</body>
+</html>

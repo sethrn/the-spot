@@ -433,6 +433,48 @@ def api_search_businesses():
         print("Search error:", e)
         return jsonify(success=False, error="Internal server error")
 
+@app.route("/api/search/business", methods=["GET"])
+def api_get_full_business_details():
+    business_id = request.args.get("businessId")
+
+    if not business_id:
+        return jsonify(success=False, error="Missing businessId")
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # === Fetch business details ===
+        with open("database/user/get_business_by_id.sql", "r") as f:
+            cur.execute(f.read(), (business_id,))
+            row = cur.fetchone()
+            if not row:
+                return jsonify(success=False, error="Business not found")
+            colnames = [desc[0] for desc in cur.description]
+            details = dict(zip(colnames, row))
+
+        # === Fetch reviews ===
+        with open("database/user/get_reviews_by_business.sql", "r") as f:
+            cur.execute(f.read(), (business_id,))
+            review_rows = cur.fetchall()
+            review_cols = [desc[0] for desc in cur.description]
+            reviews = [dict(zip(review_cols, r)) for r in review_rows]
+
+        # === Fetch tips ===
+        with open("database/user/get_tips_by_business.sql", "r") as f:
+            cur.execute(f.read(), (business_id,))
+            tip_rows = cur.fetchall()
+            tip_cols = [desc[0] for desc in cur.description]
+            tips = [dict(zip(tip_cols, r)) for r in tip_rows]
+
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True, details=details, reviews=reviews, tips=tips)
+
+    except Exception as e:
+        print("Business details error:", e)
+        return jsonify(success=False, error="Internal server error")
 
 @app.route("/api/business/review", methods=["POST"])
 def api_post_review():
