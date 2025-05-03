@@ -218,7 +218,7 @@ window.onload = () => {
             alert("No business specified.");
             return;
         }
-
+        print("Getting data for business:", business_id)
         fetch(`/api/search/business?businessId=${businessId}`)
             .then(res => res.json())
             .then(data => {
