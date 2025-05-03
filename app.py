@@ -419,7 +419,10 @@ def api_search_businesses():
         cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
         rows = cur.fetchall()
 
-        print("cur.description:", cur.description)
+        print("Fetched rows:", rows)
+
+        if not rows:
+            return jsonify(success=True, businesses=[])
 
 
         print("Returned rows:", rows)
