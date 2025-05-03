@@ -3,7 +3,7 @@ import { getSession } from "./session.js";
 window.searchBusinesses = searchBusinesses;
 let currentPage = 0;
 const pageSize = 20;
-
+console.log("user.js loaded")
 function searchBusinesses() {
     const name = document.getElementById("nameInput").value.trim();
     const state = document.getElementById("stateSelect").value;
