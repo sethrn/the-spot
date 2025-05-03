@@ -383,6 +383,10 @@ def api_search_businesses():
     page_size = data.get("page_size")
     page = data.get("page")
 
+    print("SQL Params:", name, name, state, state, is_open, is_open, limit, offset)
+    print("Types:", [type(p) for p in (name, name, state, state, is_open, is_open, limit, offset)])
+
+
     try:
         page_size = int(page_size)
         page = int(page)
