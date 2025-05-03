@@ -57,17 +57,24 @@ function searchBusinesses() {
         });
 }
 
-document.getElementById("prevPageBtn").onclick = () => {
-    if (currentPage > 0) {
-        currentPage--;
-        searchBusinesses();
-    }
-};
+const prevBtn = document.getElementById("prevPageBtn");
+if (prevBtn) {
+    prevBtn.onclick = () => {
+        if (currentPage > 0) {
+            currentPage--;
+            searchBusinesses();
+        }
+    };
+}
 
-document.getElementById("nextPageBtn").onclick = () => {
-    currentPage++;
-    searchBusinesses();
-};
+const nextBtn = document.getElementById("nextPageBtn");
+if (nextBtn) {
+    nextBtn.onclick = () => {
+        currentPage++;
+        searchBusinesses();
+    };
+}
+
 function populateBusinessDetails(data) {
     document.getElementById("bizName").innerText = data.name || "";
     document.getElementById("bizAddress").innerText = data.address || "";
