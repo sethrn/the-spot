@@ -478,23 +478,61 @@ def api_get_full_business_details():
 
 @app.route("/api/business/review", methods=["POST"])
 def api_post_review():
-    return jsonify({"success": False})
+    data = request.get_json()
+    user_id = data.get("user_id")
+    business_id = data.get("business_id")
+    text = data.get("text")
+
+    if not user_id or not business_id or not text:
+        return jsonify(success=False, error="Missing required fields")
+
+    try:
+        from utils.generate_user_id import generate_user_id  # or reuse this for reviews
+        review_id = generate_user_id()
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        with open("database/user/insert_review.sql", "r") as f:
+            sql = f.read()
+
+        cur.execute(sql, (review_id, user_id, business_id, text))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        print("Review insert error:", e)
+        return jsonify(success=False, error="Internal server error")
+
 
 @app.route("/api/business/tip", methods=["POST"])
 def api_post_tip():
-    return jsonify({"success": False})
+    data = request.get_json()
+    user_id = data.get("user_id")
+    business_id = data.get("business_id")
+    text = data.get("text")
 
-@app.route("/api/business/tip-praise", methods=["POST"])
-def api_praise_tip():
-    return jsonify({"success": False})
+    if not user_id or not business_id or not text:
+        return jsonify(success=False, error="Missing required fields")
 
-@app.route("/api/business/review-reaction", methods=["POST"])
-def api_review_reaction():
-    return jsonify({"success": False})
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        with open("database/user/insert_tip.sql", "r") as f:
+            sql = f.read()
 
-@app.route("/api/account", methods=["GET"])
-def api_get_account():
-    return jsonify({"info": {}})
+        cur.execute(sql, (user_id, business_id, text))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify(success=True)
+
+    except Exception as e:
+        print("Tip insert error:", e)
+        return jsonify(success=False, error="Internal server error")
 
 
 # === Run the app ===
