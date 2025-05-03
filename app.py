@@ -405,8 +405,16 @@ def api_search_businesses():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        with open("database/user/get_businesses_by_query.sql", "r") as f:
-            sql = f.read()
+        sql = """
+        SELECT business_id, name, stars, review_count, categories
+        FROM business
+        WHERE
+            (%s IS NULL OR name ILIKE '%' || %s || '%')
+            AND (%s IS NULL OR state = %s)
+            AND (%s IS NULL OR is_open = %s::boolean)
+        ORDER BY stars DESC
+        LIMIT %s OFFSET %s;
+        """
 
         cur.execute(sql, (name, name, state, state, is_open, is_open, limit, offset))
         rows = cur.fetchall()
