@@ -17,7 +17,7 @@ function populateBusinessForm(data) {
 function fetchBusinessDetails() {
     const params = new URLSearchParams(window.location.search);
     const businessId = params.get("businessId");
-    const accountId = sessionStorage.getItem("account_id");
+    const { accountType, accountId } = getSession();
 
     if (!businessId || !accountId) {
         alert("Missing business/account ID");
@@ -36,7 +36,7 @@ function fetchBusinessDetails() {
         });
 }
 function updateBusiness() {
-    const accountId = sessionStorage.getItem("account_id");
+    const { accountType, accountId } = getSession();
     const businessId = sessionStorage.getItem("current_business_id");
 
     if (!accountId || !businessId) {
