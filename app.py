@@ -383,9 +383,6 @@ def api_search_businesses():
     page_size = data.get("page_size")
     page = data.get("page")
 
-    print("SQL Params:", name, name, state, state, is_open, is_open, limit, offset)
-    print("Types:", [type(p) for p in (name, name, state, state, is_open, is_open, limit, offset)])
-
 
     try:
         page_size = int(page_size)
@@ -396,6 +393,9 @@ def api_search_businesses():
 
     offset = page * page_size
     limit = page_size
+
+    print("SQL Params:", name, name, state, state, is_open, is_open, limit, offset)
+    print("Types:", [type(p) for p in (name, name, state, state, is_open, is_open, limit, offset)])
 
     try:
         conn = get_db_connection()
