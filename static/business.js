@@ -45,10 +45,9 @@ function updateBusiness() {
         return;
     }
 
-    // Get all updated form values
     const data = {
         business_id: businessId,
-        business_account_id: parseInt(accountId),
+        account_id: parseInt(accountId),
         name: document.getElementById("name").value,
         address: document.getElementById("address").value,
         city: document.getElementById("city").value,
@@ -175,3 +174,5 @@ window.onload = () => {
         fetchBusinessDetails();
     }
 };
+
+window.updateBusiness = updateBusiness;
